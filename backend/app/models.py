@@ -1,0 +1,49 @@
+from sqlalchemy import Column, Integer, String, Text, DateTime, Float, Boolean, JSON
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
+import datetime
+
+Base = declarative_base()
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True)  # Removed unique constraint if it causes issues
+    user_message = Column(Text)
+    agent_response = Column(Text)
+    language = Column(String, default="english")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    conversation_data = Column(JSON)
+
+class Property(Base):
+    __tablename__ = "properties"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    description = Column(Text)
+    price = Column(Float)
+    location = Column(String)
+    property_type = Column(String)
+    bedrooms = Column(Integer)
+    bathrooms = Column(Integer)
+    area_sqft = Column(Float)
+    amenities = Column(JSON)
+    images = Column(JSON)
+    available_from = Column(DateTime)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class UserPreference(Base):
+    __tablename__ = "user_preferences"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True)
+    budget_min = Column(Float)
+    budget_max = Column(Float)
+    preferred_locations = Column(JSON)
+    property_types = Column(JSON)
+    bedrooms = Column(Integer)
+    amenities = Column(JSON)
+    language = Column(String, default="english")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
