@@ -230,3 +230,339 @@ body {
 .messages-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Add these styles to your existing App.css */
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.language-selector label {
+  color: #666;
+  font-weight: 500;
+}
+
+.language-dropdown {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.language-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.language-dropdown:hover {
+  border-color: #007bff;
+}
+
+/* RTL support for Arabic messages */
+.message[dir="rtl"] {
+  text-align: right;
+}
+
+.message[dir="rtl"] .message-content {
+  text-align: right;
+}
+
+/* Ensure proper text direction for different languages */
+.message[data-language="arabic"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.message[data-language="arabic"] .message-content {
+  direction: rtl;
+  text-align: right;
+}
+
+.message[data-language="tamil"] {
+  font-family: Arial, sans-serif; /* Ensure Tamil font support */
+}
+
+/* Welcome message RTL support */
+.welcome-message[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.welcome-message[dir="rtl"] ul {
+  padding-right: 20px;
+}
+
+.welcome-message[dir="rtl"] li {
+  text-align: right;
+}
+
+/* Input placeholder RTL */
+.input-container textarea[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Responsive design for language selector */
+@media (max-width: 768px) {
+  .language-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .language-dropdown {
+    width: 100%;
+  }
+}
+
+/* Chat header layout adjustments */
+.chat-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-header h1 {
+  margin: 0;
+}
+
+.chat-header > p {
+  margin: 0;
+  color: #666;
+}
+
+/* Clear button alignment */
+.clear-btn {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-main {
+  flex: 1;
+  min-width: 200px;
+}
+
+.header-main h1 {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.header-main p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+.header-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  min-width: 200px;
+}
+
+/* Language Selector */
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.language-selector label {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.language-dropdown {
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.language-dropdown:focus {
+  outline: none;
+  border-color: white;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.language-dropdown:hover {
+  background: white;
+  border-color: white;
+}
+
+/* Clear Button */
+.clear-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.clear-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: white;
+}
+
+.clear-btn:active {
+  transform: translateY(1px);
+}
+
+/* RTL support for Arabic messages and header */
+.chat-header[dir="rtl"] {
+  text-align: right;
+}
+
+.chat-header[dir="rtl"] .header-controls {
+  align-items: flex-start;
+}
+
+.chat-header[dir="rtl"] .language-selector {
+  flex-direction: row-reverse;
+}
+
+/* Message RTL support */
+.message[dir="rtl"] {
+  text-align: right;
+}
+
+.message[dir="rtl"] .message-content {
+  text-align: right;
+}
+
+/* Ensure proper text direction for different languages */
+.message[data-language="arabic"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.message[data-language="arabic"] .message-content {
+  direction: rtl;
+  text-align: right;
+}
+
+.message[data-language="tamil"] {
+  font-family: Arial, sans-serif;
+}
+
+/* Welcome message RTL support */
+.welcome-message[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.welcome-message[dir="rtl"] ul {
+  padding-right: 20px;
+}
+
+.welcome-message[dir="rtl"] li {
+  text-align: right;
+}
+
+/* Input container RTL support */
+.input-container textarea[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .chat-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .header-main {
+    text-align: center;
+  }
+  
+  .header-controls {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .language-selector {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .language-dropdown {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .language-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .clear-btn {
+    width: 100%;
+  }
+}
+
+/* Language badge styles */
+.language-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  color: #666;
+  margin-top: 5px;
+  display: inline-block;
+}
+
+.user-message .language-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.agent-message .language-badge {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
