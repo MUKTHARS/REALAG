@@ -29,6 +29,7 @@ class PropertyResponse(PropertyBase):
 class ChatMessage(BaseModel):
     message: str
     session_id: Optional[str] = None
+    language: Optional[str] = "auto"  # Add language field
 
 class ChatResponse(BaseModel):
     response: str

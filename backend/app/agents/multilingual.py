@@ -72,7 +72,9 @@ Conversation History:
 
 **CRITICAL RESPONSE FORMATTING RULES - MUST FOLLOW EXACTLY:**
 
-1. **RESPONSE STRUCTURE**: 
+1. **LANGUAGE REQUIREMENT**: You MUST respond entirely in {language}. Never mix languages in your response.
+
+2. **RESPONSE STRUCTURE**: 
    - Use PROPER LINE BREAKS between paragraphs and sections
    - Use clear section headings
    - Use numbered lists for main items
@@ -80,16 +82,33 @@ Conversation History:
    - Leave ONE blank line between major sections
    - Use proper spacing for readability
 
-2. **FORMATTING STYLE**:
+3. **FORMATTING STYLE**:
    - For section headers: Use ALL CAPS or Title Case, followed by a blank line
    - For lists: Use proper indentation and line breaks
    - For paragraphs: Keep them concise with proper line breaks
 
-3. **LANGUAGE**: Respond entirely in {language}
+**LANGUAGE-SPECIFIC GUIDELINES:**
+
+ENGLISH:
+- Use professional British English
+- Format: Standard Western formatting with left-to-right text
+- Use standard English punctuation and spacing
+
+ARABIC:
+- Use formal Modern Standard Arabic
+- Format: Right-to-left text alignment
+- Use proper Arabic punctuation (، ؛ .)
+- Ensure proper Arabic character rendering
+
+TAMIL:
+- Use formal Tamil language
+- Format: Left-to-right text alignment  
+- Use proper Tamil punctuation
+- Ensure proper Tamil character rendering
 
 **FORMATTING EXAMPLES - FOLLOW THIS EXACT STYLE:**
 
-GOOD EXAMPLE:
+GOOD EXAMPLE (ENGLISH):
 TOP REAL ESTATE COMPANIES IN DUBAI
 
 Dubai's real estate sector features several prominent developers that have shaped the city's iconic skyline.
@@ -104,15 +123,6 @@ Key Projects:
 • Dubai Marina - Waterfront residential community
 • Arabian Ranches - Luxury villa community
 
-2. NAKHEEL PROPERTIES
-Description: Nakheel is a world-leading master developer famous for innovative coastal developments that have redefined Dubai's geography.
-
-Key Projects:
-• Palm Jumeirah - Iconic palm-shaped island
-• The World Islands - Archipelago shaped like world map
-• Jumeirah Islands - Luxury waterfront clusters
-• Discovery Gardens - Large residential community
-
 CONCLUSION
 These companies have significantly contributed to Dubai's growth and reputation as a global real estate hub, offering diverse investment opportunities across residential, commercial, and hospitality sectors.
 
@@ -121,7 +131,8 @@ These companies have significantly contributed to Dubai's growth and reputation 
 - Make responses visually appealing and easy to read
 - Use consistent formatting throughout
 - Keep paragraphs short and focused
-- Ensure good readability on both mobile and desktop"""
+- Ensure good readability on both mobile and desktop
+- MOST IMPORTANT: Respond ONLY in {language}"""
 
         self.human_template = "{text}"
 
@@ -130,8 +141,12 @@ These companies have significantly contributed to Dubai's growth and reputation 
             HumanMessagePromptTemplate.from_template(self.human_template)
         ])
         
-    def detect_language(self, message):
-        """Detect language of the message with fallback"""
+    def detect_language(self, message, requested_language="auto"):
+        """Detect language of the message with fallback, respecting requested language"""
+        # If user specifically requested a language, use it
+        if requested_language and requested_language != "auto":
+            return requested_language.lower()
+            
         if not message or not message.strip():
             return "english"
             
@@ -259,9 +274,10 @@ These companies have significantly contributed to Dubai's growth and reputation 
         
         return text.strip()
     
-    def generate_response(self, session_id, message, available_properties=None):
+    def generate_response(self, session_id, message, available_properties=None, requested_language="auto"):
         try:
-            language = self.detect_language(message)
+            # Use requested language if provided, otherwise detect
+            language = self.detect_language(message, requested_language)
             memory = self.get_memory(session_id)
             
             # Extract user preferences
@@ -279,7 +295,7 @@ These companies have significantly contributed to Dubai's growth and reputation 
             # Get formatted conversation history from memory
             history_text = self.format_messages_for_prompt(memory)
             
-            # Format the prompt using LangChain template
+            # Format the prompt using LangChain template with explicit language instruction
             formatted_prompt = self.chat_prompt.format(
                 language=language,
                 properties_context=properties_context,
@@ -342,15 +358,17 @@ These companies have significantly contributed to Dubai's growth and reputation 
             import traceback
             print(f"Full traceback: {traceback.format_exc()}")
             
+            # Use requested language for fallback response
+            fallback_language = self.detect_language(message, requested_language)
             return {
-                "response": self.get_structured_fallback_response(self.detect_language(message), message),
-                "language": self.detect_language(message),
+                "response": self.get_structured_fallback_response(fallback_language, message),
+                "language": fallback_language,
                 "preferences": {},
                 "session_id": session_id
             }
     
     def get_structured_fallback_response(self, language, user_message):
-        """Get structured fallback response with proper formatting"""
+        """Get structured fallback response with proper formatting in the correct language"""
         user_message_lower = user_message.lower()
         
         if "company" in user_message_lower or "developer" in user_message_lower or "real estate" in user_message_lower:

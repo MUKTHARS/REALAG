@@ -17,15 +17,20 @@ agent_service = RealEstateAgentService(settings.GEMINI_API_KEY)
 @router.post("/chat", response_model=ChatResponse)
 async def chat(message: ChatMessage, db: Session = Depends(get_db)):
     try:
-        logger.info(f"Processing chat message for session: {message.session_id}")
+        logger.info(f"Processing chat message for session: {message.session_id}, language: {message.language}")
         
         if not message.message or not message.message.strip():
             raise HTTPException(status_code=400, detail="Message cannot be empty")
         
-        # Process the message through the agent service
-        result = agent_service.process_message(db, message.session_id, message.message)
+        # Process the message through the agent service with language preference
+        result = agent_service.process_message(
+            db, 
+            message.session_id, 
+            message.message,
+            message.language
+        )
         
-        logger.info("Successfully processed chat message")
+        logger.info(f"Successfully processed chat message. Response language: {result['language']}")
         return result
         
     except HTTPException:
@@ -35,7 +40,7 @@ async def chat(message: ChatMessage, db: Session = Depends(get_db)):
         # Return a fallback response instead of raising exception
         return {
             "response": "I apologize for the inconvenience. I'm currently experiencing technical difficulties. Please try again in a moment.",
-            "language": "english",
+            "language": message.language if message.language != "auto" else "english",
             "session_id": message.session_id or "unknown",
             "timestamp": "2024-01-01T00:00:00Z"
         }

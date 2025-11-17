@@ -10,13 +10,18 @@ class RealEstateAgentService:
             raise ValueError("Gemini API key is required")
         self.agent = MultilingualRealEstateAgent(api_key)
     
-    def process_message(self, db: Session, session_id: str, message: str):
+    def process_message(self, db: Session, session_id: str, message: str, requested_language: str = "auto"):
         try:
             # Get available properties from database
             properties = self.get_available_properties(db)
             
-            # Generate response using Gemini
-            result = self.agent.generate_response(session_id, message, properties)
+            # Generate response using Gemini with requested language
+            result = self.agent.generate_response(
+                session_id, 
+                message, 
+                properties,
+                requested_language
+            )
             
             # Save conversation
             conversation = Conversation(
@@ -47,7 +52,7 @@ class RealEstateAgentService:
             # Return a fallback response
             return {
                 "response": "I'm experiencing technical difficulties. Please try again in a moment.",
-                "language": "english",
+                "language": requested_language if requested_language != "auto" else "english",
                 "session_id": session_id,
                 "timestamp": datetime.utcnow().isoformat()
             }
