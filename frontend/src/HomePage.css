@@ -98,7 +98,7 @@
 
 .nav-links a {
   text-decoration: none;
-  color: var(--text-secondary);
+  color: #000000;
   font-weight: 500;
   font-size: 0.95rem;
   transition: all 0.3s ease;
@@ -270,7 +270,7 @@
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  color: var(--primary-deep);
+  color: #ffffff;
   margin-bottom: 1.5rem;
   position: relative;
 }
@@ -400,7 +400,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   text-align: center;
-  color: var(--primary-deep);
+  color: #ffffff;
   margin-bottom: 3rem;
   position: relative;
 }
@@ -412,6 +412,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 80px;
+  color: #ffffff;
   height: 4px;
   background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   border-radius: 2px;
@@ -421,6 +422,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2.5rem;
+  
+}
+.features-section .section-title {
+  color: #ffffff !important;
+}
+
+/* Also fix the feature card headings */
+
+
+.feature-card p {
+  color: #e2e8f0 !important; /* Dark gray for descriptions */
 }
 
 .feature-card {
@@ -470,7 +482,7 @@
 .feature-card h3 {
   font-size: 1.375rem;
   font-weight: 600;
-  color: var(--primary-deep);
+  color: #ffffff;
   margin-bottom: 1rem;
 }
 
@@ -492,11 +504,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 5rem;
   align-items: center;
+  
 }
 
 .about-text h2 {
   text-align: left;
   margin-bottom: 2rem;
+  color:#edf2f7;
 }
 
 .about-text h2::after {
@@ -660,7 +674,7 @@
 }
 
 .orbit::before {
-  content: '🏠';
+  content: '⚪';
   position: absolute;
   top: -15px;
   left: 50%;
@@ -670,11 +684,11 @@
 }
 
 .orbit-2::before {
-  content: '💰';
+  content: '🔵';
 }
 
 .orbit-3::before {
-  content: '📈';
+  content: '🔴';
 }
 
 /* Modern Footer */
@@ -1041,15 +1055,17 @@ html {
 /* Fix Dark Text Colors in Homepage */
 .hero-subtitle,
 .feature-card p,
-.about-description,
-.about-mission,
-.stat-label,
+
 .footer-brand p,
 .footer-links a,
 .footer-bottom p {
   color: var(--text-secondary) !important;
 }
-
+.about-text h2,
+.about-description,
+.about-mission,
+.stat-label  {color: #ffffff !important;
+}
 /* Enhanced Mobile Hero Section */
 @media (max-width: 768px) {
   .hero-section {
@@ -1099,8 +1115,6 @@ html {
   }
 }
 
-/* Ensure proper text contrast in all sections */
-.feature-card h3,
 .stat-value,
 .section-title {
   color: var(--primary-deep) !important;

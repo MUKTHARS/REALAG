@@ -64,6 +64,26 @@ class MultilingualRealEstateAgent:
         self.system_template = """You are a professional real estate agent in Dubai. You speak {language} fluently.
 Your role is to help users find properties, answer real estate questions, and provide market insights.
 
+**STRICT CONTENT POLICY - YOU MUST FOLLOW THESE RULES:**
+
+1. **DUBAI REAL ESTATE FOCUS ONLY**: You are ONLY allowed to discuss topics related to Dubai real estate, properties, and related services.
+
+2. **PROHIBITED TOPICS**: You MUST NOT respond to any questions about:
+   - Cars, vehicles, automotive topics (Lamborghini, Ferrari, etc.)
+   - Stock market, investments, cryptocurrencies
+   - Politics, religion, or sensitive topics
+   - Technology, gadgets, or electronics
+   - Travel, tourism (unless related to property viewing)
+   - Food, restaurants, entertainment
+   - Sports, celebrities, or entertainment
+   - Any topic not directly related to Dubai real estate
+
+3. **REDIRECTION POLICY**: If asked about prohibited topics:
+   - Politely decline to answer
+   - Clearly state that you only discuss Dubai real estate
+   - Redirect the conversation back to property-related topics
+   - Do not provide any information, even if you know it
+
 Current available properties context:
 {properties_context}
 
@@ -74,7 +94,9 @@ Conversation History:
 
 1. **LANGUAGE REQUIREMENT**: You MUST respond entirely in {language}. Never mix languages in your response.
 
-2. **RESPONSE STRUCTURE**: 
+2. **CONTENT SCOPE**: Only discuss Dubai real estate topics. Redirect all other queries.
+
+3. **RESPONSE STRUCTURE**: 
    - Use PROPER LINE BREAKS between paragraphs and sections
    - Use clear section headings
    - Use numbered lists for main items
@@ -82,7 +104,7 @@ Conversation History:
    - Leave ONE blank line between major sections
    - Use proper spacing for readability
 
-3. **FORMATTING STYLE**:
+4. **FORMATTING STYLE**:
    - For section headers: Use ALL CAPS or Title Case, followed by a blank line
    - For lists: Use proper indentation and line breaks
    - For paragraphs: Keep them concise with proper line breaks
@@ -106,25 +128,13 @@ TAMIL:
 - Use proper Tamil punctuation
 - Ensure proper Tamil character rendering
 
-**FORMATTING EXAMPLES - FOLLOW THIS EXACT STYLE:**
+**REDIRECTION EXAMPLES FOR PROHIBITED TOPICS:**
 
-GOOD EXAMPLE (ENGLISH):
-TOP REAL ESTATE COMPANIES IN DUBAI
+If asked about cars: "I specialize exclusively in Dubai real estate and cannot provide information about vehicles. How can I assist you with property inquiries in Dubai today?"
 
-Dubai's real estate sector features several prominent developers that have shaped the city's iconic skyline.
+If asked about stocks: "My expertise is limited to Dubai's property market. I'd be happy to discuss real estate investment opportunities instead."
 
-1. EMAAR PROPERTIES
-Description: Emaar is one of the world's most valuable real estate development companies, known for iconic projects that have transformed Dubai's landscape.
-
-Key Projects:
-• Burj Khalifa - World's tallest building
-• The Dubai Mall - Largest shopping mall globally
-• Downtown Dubai - Premier mixed-use development
-• Dubai Marina - Waterfront residential community
-• Arabian Ranches - Luxury villa community
-
-CONCLUSION
-These companies have significantly contributed to Dubai's growth and reputation as a global real estate hub, offering diverse investment opportunities across residential, commercial, and hospitality sectors.
+If asked about travel: "I focus on helping clients with Dubai property matters. Are you looking for properties to visit or invest in?"
 
 **CONTENT GUIDELINES:**
 - Always use proper line breaks and spacing
@@ -132,7 +142,7 @@ These companies have significantly contributed to Dubai's growth and reputation 
 - Use consistent formatting throughout
 - Keep paragraphs short and focused
 - Ensure good readability on both mobile and desktop
-- MOST IMPORTANT: Respond ONLY in {language}"""
+- MOST IMPORTANT: Respond ONLY in {language} and ONLY about Dubai real estate"""
 
         self.human_template = "{text}"
 
@@ -242,6 +252,68 @@ These companies have significantly contributed to Dubai's growth and reputation 
         
         return formatted_history.strip()
     
+    def is_real_estate_related(self, message):
+        """Check if the message is related to Dubai real estate"""
+        message_lower = message.lower()
+        
+        # Real estate keywords
+        real_estate_keywords = [
+            'property', 'properties', 'real estate', 'realestate', 'house', 'apartment', 'villa',
+            'studio', 'penthouse', 'duplex', 'townhouse', 'condo', 'flat', 'rent', 'buy', 'purchase',
+            'sell', 'sale', 'investment', 'invest', 'price', 'cost', 'budget', 'aed', 'location',
+            'area', 'sqft', 'square feet', 'bedroom', 'bathroom', 'amenities', 'facilities',
+            'developer', 'construction', 'built', 'ready', 'offplan', 'community', 'compound',
+            'view', 'facing', 'parking', 'balcony', 'terrace', 'garden', 'pool', 'gym', 'security',
+            'maintenance', 'service', 'charge', 'fee', 'commission', 'agent', 'broker', 'agency',
+            'dubai', 'uae', 'emirates', 'emirate', 'burj', 'marina', 'palm', 'jumeirah', 'deira',
+            'downtown', 'business bay', 'sheikh zayed', 'szx', 'dubai hills', 'arabian ranches',
+            'motor city', 'sports city', 'international city', 'discovery gardens', 'jlt', 'jumeirah lake',
+            'dubai creek', 'dubai harbour', 'bluewaters', 'city walk', 'dubai design district', 'd3',
+            'al barsha', 'al quoz', 'al safa', 'al wasl', 'al manara', 'umm suqeim', 'nad al sheba',
+            'mirdif', 'meydan', 'ras al khor', 'dubai silicon oasis', 'dso', 'dubai investment park',
+            'dip', 'dubai land', 'dubai south', 'dubai world central', 'dwc', 'expo', 'expo city',
+            'rental', 'lease', 'tenancy', 'tenant', 'landlord', 'owner', 'mortgage', 'loan', 'finance',
+            'down payment', 'deposit', 'contract', 'agreement', 'ejari', 'rera', 'dld', 'dubai land department',
+            'transfer fee', 'registration', 'title deed', 'ownership', 'freehold', 'leasehold'
+        ]
+        
+        # Prohibited topics keywords
+        prohibited_keywords = [
+            'car', 'vehicle', 'automotive', 'lamborghini', 'ferrari', 'porsche', 'bmw', 'mercedes', 'audi',
+            'toyota', 'honda', 'nissan', 'ford', 'chevrolet', 'hyundai', 'kia', 'volkswagen', 'volvo',
+            'stock', 'share', 'market', 'trading', 'investment', 'crypto', 'bitcoin', 'ethereum', 'forex',
+            'currency', 'exchange', 'dollar', 'euro', 'pound', 'politics', 'government', 'election', 'vote',
+            'religion', 'islam', 'christian', 'hindu', 'buddhist', 'jewish', 'god', 'prayer', 'worship',
+            'technology', 'gadget', 'iphone', 'samsung', 'laptop', 'computer', 'software', 'hardware',
+            'travel', 'tourism', 'vacation', 'holiday', 'flight', 'airline', 'hotel', 'resort', 'beach',
+            'food', 'restaurant', 'cafe', 'cuisine', 'meal', 'dinner', 'lunch', 'breakfast', 'recipe',
+            'sports', 'football', 'soccer', 'cricket', 'tennis', 'basketball', 'golf', 'fitness', 'exercise',
+            'celebrity', 'movie', 'film', 'music', 'song', 'artist', 'actor', 'actress', 'entertainment',
+            'weather', 'climate', 'temperature', 'rain', 'sun', 'health', 'medical', 'doctor', 'hospital',
+            'education', 'school', 'university', 'college', 'course', 'study', 'learn', 'student'
+        ]
+        
+        # Check if message contains real estate keywords
+        has_real_estate_keywords = any(keyword in message_lower for keyword in real_estate_keywords)
+        
+        # Check if message contains prohibited keywords
+        has_prohibited_keywords = any(keyword in message_lower for keyword in prohibited_keywords)
+        
+        # If it has prohibited keywords but no real estate context, it's not related
+        if has_prohibited_keywords and not has_real_estate_keywords:
+            return False
+        
+        # If it has real estate keywords, it's related
+        if has_real_estate_keywords:
+            return True
+        
+        # For very short or ambiguous messages, assume it might be real estate related
+        # to allow for natural conversation flow
+        if len(message.split()) <= 3:
+            return True
+            
+        return False
+    
     def enhance_response_formatting(self, text):
         """Enhance the formatting of the response for better readability"""
         if not text:
@@ -279,6 +351,54 @@ These companies have significantly contributed to Dubai's growth and reputation 
             # Use requested language if provided, otherwise detect
             language = self.detect_language(message, requested_language)
             memory = self.get_memory(session_id)
+            
+            # Check if message is real estate related
+            if not self.is_real_estate_related(message):
+                # Return a polite redirection message
+                redirection_responses = {
+                    "english": """I specialize exclusively in Dubai real estate and cannot provide information on other topics.
+
+How can I assist you with:
+• Property search and recommendations in Dubai
+• Real estate market insights
+• Investment opportunities in Dubai properties
+• Area information and community details
+
+Please let me know how I can help with your Dubai property needs!""",
+
+                    "arabic": """أتخصص حصريًا في عقارات دبي ولا يمكنني تقديم معلومات حول مواضيع أخرى.
+
+كيف يمكنني مساعدتك في:
+• البحث عن العقارات والتوصيات في دبي
+• رؤى سوق العقارات
+• فرص الاستثمار في عقارات دبي
+• معلومات المناطق وتفاصيل المجتمعات
+
+يرجى إخباري كيف يمكنني المساعدة في احتياجاتك العقارية في دبي!""",
+
+                    "tamil": """நான் பிரத்தியேகமாக டுபாய் ரியல் எஸ்டேட்டில் நிபுணத்துவம் பெற்றுள்ளேன் மற்றும் பிற தலைப்புகள் குறித்து தகவல்களை வழங்க முடியாது.
+
+டுபாயில் உள்ள பின்வரும் துறைகளில் நான் உங்களுக்கு எவ்வாறு உதவ முடியும்:
+• வீடு தேடல் மற்றும் பரிந்துரைகள்
+• ரியல் எஸ்டேட் சந்தை நுண்ணறிவுகள்
+• டுபாய் வீடுகளில் முதலீட்டு வாய்ப்புகள்
+• பகுதி தகவல்கள் மற்றும் கம்யூனிட்டி விவரங்கள்
+
+தயவு செய்து டுபாயில் உங்கள் வீடு தேவைகளுக்கு நான் எவ்வாறு உதவ முடியும் என்று சொல்லுங்கள்!"""
+                }
+                
+                response_text = redirection_responses.get(language, redirection_responses["english"])
+                
+                # Save to memory
+                memory.chat_memory.add_user_message(message)
+                memory.chat_memory.add_ai_message(response_text)
+                
+                return {
+                    "response": response_text,
+                    "language": language,
+                    "preferences": {},
+                    "session_id": session_id
+                }
             
             # Extract user preferences
             preferences = self.extract_preferences(message, language)

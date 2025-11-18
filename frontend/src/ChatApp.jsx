@@ -529,7 +529,7 @@ const handleGoogleLogin = () => {
                 ☰
               </button>
             )}
-            <Link to="/" className="back-btn">←</Link>
+            <Link to="/"></Link>
             <span className="chat-title">{content.title}</span>
           </div>
           <div className="header-right">
@@ -570,7 +570,7 @@ const handleGoogleLogin = () => {
             <div className="welcome-simple">
               <div className="welcome-icon">🏢</div>
               <p>{content.welcome}</p>
-              {!user && (
+              {/* {!user && (
                 <div className="guest-notice">
                   <p>You are in guest mode. Login to save your chat history.</p>
                   <button 
@@ -580,7 +580,7 @@ const handleGoogleLogin = () => {
                     Login to Save Chats
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           )}
           
