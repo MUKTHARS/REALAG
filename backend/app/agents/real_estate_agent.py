@@ -10,7 +10,7 @@ class RealEstateAgentService:
             raise ValueError("Gemini API key is required")
         self.agent = MultilingualRealEstateAgent(api_key)
     
-    def process_message(self, db: Session, session_id: str, message: str, requested_language: str = "auto"):
+    def process_message(self, db: Session, session_id: str, message: str, requested_language: str = "auto", user_id: int = None):
         try:
             # Get available properties from database
             properties = self.get_available_properties(db)
@@ -23,9 +23,10 @@ class RealEstateAgentService:
                 requested_language
             )
             
-            # Save conversation
+            # Save conversation with user_id
             conversation = Conversation(
                 session_id=session_id,
+                user_id=user_id,  # Link to specific user
                 user_message=message,
                 agent_response=result["response"],
                 language=result["language"],

@@ -973,3 +973,35 @@
     color-scheme: dark;
   }
 }
+
+/* Enhanced Sidebar Styles */
+.chat-history-item.active {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+}
+
+.chat-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.chat-date {
+  color: var(--text-tertiary);
+}
+
+.message-count {
+  color: var(--accent-primary);
+  font-weight: 600;
+  background: rgba(214, 158, 46, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+}
+
+/* Loading states */
+.loading-chat {
+  opacity: 0.7;
+  pointer-events: none;
+}

@@ -94,3 +94,13 @@ ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS user_id INTEGER;
 CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+-- Update existing chat_sessions to have NULL user_id for old data
+UPDATE chat_sessions SET user_id = NULL WHERE user_id IS NULL;
+
+-- Update existing conversations to have NULL user_id for old data  
+UPDATE conversations SET user_id = NULL WHERE user_id IS NULL;
+
+-- Add constraints to ensure data integrity
+ALTER TABLE chat_sessions ALTER COLUMN user_id SET DEFAULT NULL;
+ALTER TABLE conversations ALTER COLUMN user_id SET DEFAULT NULL;

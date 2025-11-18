@@ -97,23 +97,47 @@ function ChatApp() {
 
   const content = chatContent[currentLanguage];
 
-  useEffect(() => {
-    // Check if user is logged in from localStorage
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+useEffect(() => {
+  // Check if user is logged in from localStorage
+  const savedUser = localStorage.getItem('user');
+  const savedSessionId = localStorage.getItem('currentSessionId');
+  const savedMessages = localStorage.getItem('currentChatMessages');
+  
+  if (savedUser) {
+    try {
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      console.log('User loaded from localStorage:', userData);
+    } catch (e) {
+      console.error('Error parsing saved user:', e);
+      localStorage.removeItem('user');
     }
-    
+  }
+  
+  // Load session and messages
+  if (savedSessionId) {
+    setSessionId(savedSessionId);
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error('Error parsing saved messages:', e);
+        setMessages([]);
+      }
+    }
+  } else {
     const newSessionId = generateSessionId();
     setSessionId(newSessionId);
-    if (savedUser) {
-      loadConversationHistory(newSessionId);
-      loadChatHistory();
-    }
-  }, []);
+    localStorage.setItem('currentSessionId', newSessionId);
+  }
+}, []);
 
   useEffect(() => {
     scrollToBottom();
+    // Save messages to localStorage whenever they change
+    if (messages.length > 0) {
+      localStorage.setItem('currentChatMessages', JSON.stringify(messages));
+    }
   }, [messages]);
 
   const generateSessionId = () => {
@@ -133,8 +157,10 @@ function ChatApp() {
           { type: 'agent', content: conv.agent_response, language: conv.language }
         ]);
         setMessages(history);
+        localStorage.setItem('currentChatMessages', JSON.stringify(history));
       } else {
         setMessages([]);
+        localStorage.removeItem('currentChatMessages');
       }
     } catch (error) {
       console.error('Error loading conversation history:', error);
@@ -142,70 +168,115 @@ function ChatApp() {
     }
   };
 
-  const loadChatHistory = async () => {
-    if (!user) return;
+const loadChatHistory = async () => {
+  if (!user || !user.token) {
+    console.log('No user or token found, skipping chat history load');
+    return;
+  }
+  
+  try {
+    console.log('Loading chat history for user:', user.id);
+    const response = await axios.get(`${API_BASE}/chat-sessions`, {
+      headers: { Authorization: `Bearer ${user.token}` },
+      params: { user_id: user.id }
+    });
     
-    try {
-      const response = await axios.get(`${API_BASE}/chat-sessions`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setChatHistory(response.data.sessions || []);
-    } catch (error) {
-      console.error('Error loading chat history:', error);
+    if (response.data && response.data.sessions) {
+      console.log('Chat history loaded:', response.data.sessions.length, 'sessions');
+      setChatHistory(response.data.sessions);
+      localStorage.setItem('chatHistory', JSON.stringify(response.data.sessions));
+    }
+  } catch (error) {
+    console.error('Error loading chat history:', error);
+    // Keep existing history if available
+    if (!chatHistory.length) {
       setChatHistory([]);
     }
-  };
+  }
+};
+
+useEffect(() => {
+  if (user && user.token) {
+    console.log('User authenticated, loading chat history');
+    loadChatHistory();
+  } else {
+    console.log('No user, clearing chat history');
+    setChatHistory([]);
+  }
+}, [user]);
+
+
+useEffect(() => {
+  if (user) {
+    console.log('User state changed, loading chat history');
+    loadChatHistory();
+  }
+}, [user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+const sendMessage = async () => {
+  if (!inputMessage.trim() || isLoading) return;
 
-    const userMessage = inputMessage.trim();
-    setInputMessage('');
-    setIsLoading(true);
+  const userMessage = inputMessage.trim();
+  setInputMessage('');
+  setIsLoading(true);
 
-    const newUserMessage = { 
-      type: 'user', 
-      content: userMessage,
+  const newUserMessage = { 
+    type: 'user', 
+    content: userMessage,
+    language: currentLanguage
+  };
+  const updatedMessages = [...messages, newUserMessage];
+  setMessages(updatedMessages);
+  localStorage.setItem('currentChatMessages', JSON.stringify(updatedMessages));
+
+  try {
+    const messageData = {
+      message: userMessage,
+      session_id: sessionId,
       language: currentLanguage
     };
-    setMessages(prev => [...prev, newUserMessage]);
 
-    try {
-      const messageData = {
-        message: userMessage,
-        session_id: user ? sessionId : null, // Only send session_id if logged in
-        language: currentLanguage
-      };
+    const config = user ? { 
+      headers: { Authorization: `Bearer ${user.token}` },
+      params: {
+        user_id: user.id  // Send user_id as query parameter in POST request
+      }
+    } : {};
 
-      const config = user ? { 
-        headers: { Authorization: `Bearer ${user.token}` } 
-      } : {};
+    const response = await axios.post(`${API_BASE}/chat`, messageData, config);
 
-      const response = await axios.post(`${API_BASE}/chat`, messageData, config);
+    const agentMessage = {
+      type: 'agent',
+      content: response.data.response,
+      language: response.data.language
+    };
+    const finalMessages = [...updatedMessages, agentMessage];
+    setMessages(finalMessages);
+    localStorage.setItem('currentChatMessages', JSON.stringify(finalMessages));
 
-      const agentMessage = {
-        type: 'agent',
-        content: response.data.response,
-        language: response.data.language
-      };
-      setMessages(prev => [...prev, agentMessage]);
-
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage = {
-        type: 'agent',
-        content: 'Sorry, I encountered an error. Please try again.',
-        language: currentLanguage
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+    // Reload chat history to update the sidebar with user-specific data
+    if (user) {
+      loadChatHistory();
     }
-  };
+
+  } catch (error) {
+    console.error('Error sending message:', error);
+    const errorMessage = {
+      type: 'agent',
+      content: 'Sorry, I encountered an error. Please try again.',
+      language: currentLanguage
+    };
+    const errorMessages = [...updatedMessages, errorMessage];
+    setMessages(errorMessages);
+    localStorage.setItem('currentChatMessages', JSON.stringify(errorMessages));
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -216,8 +287,10 @@ function ChatApp() {
 
   const clearChat = () => {
     setMessages([]);
+    localStorage.removeItem('currentChatMessages');
     const newSessionId = generateSessionId();
     setSessionId(newSessionId);
+    localStorage.setItem('currentSessionId', newSessionId);
   };
 
 const handleAuth = async (e) => {
@@ -239,8 +312,9 @@ const handleAuth = async (e) => {
     setShowAuthModal(false);
     setAuthData({ email: '', password: '', name: '' });
     
-    // Reload chat history for logged in user
-    loadChatHistory();
+    // Load chat history immediately after login
+    await loadChatHistory();
+    
   } catch (error) {
     console.error('Authentication error details:', error);
     console.error('Error response:', error.response?.data);
@@ -259,19 +333,23 @@ const handleAuth = async (e) => {
   }
 };
 
-  const handleGoogleLogin = () => {
-    // Simulate OAuth login - in real app, this would redirect to OAuth provider
-    const mockUser = {
-      id: 1,
-      name: 'Google User',
-      email: 'user@gmail.com',
-      token: 'google_oauth_token_' + Math.random().toString(36).substr(2, 9)
-    };
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    setShowAuthModal(false);
-    loadChatHistory();
+const handleGoogleLogin = () => {
+  // Simulate OAuth login - in real app, this would redirect to OAuth provider
+  const mockUser = {
+    id: 1,
+    name: 'Google User',
+    email: 'user@gmail.com',
+    token: 'google_oauth_token_' + Math.random().toString(36).substr(2, 9)
   };
+  setUser(mockUser);
+  localStorage.setItem('user', JSON.stringify(mockUser));
+  setShowAuthModal(false);
+  
+  // Load chat history immediately after Google login
+  setTimeout(() => {
+    loadChatHistory();
+  }, 100);
+};
 
   const handleGuestMode = () => {
     setShowAuthModal(false);
@@ -281,16 +359,44 @@ const handleAuth = async (e) => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('currentSessionId');
+    localStorage.removeItem('currentChatMessages');
+    localStorage.removeItem('chatHistory');
     setMessages([]);
     setChatHistory([]);
     const newSessionId = generateSessionId();
     setSessionId(newSessionId);
+    localStorage.setItem('currentSessionId', newSessionId);
   };
 
-  const loadChat = (chatId) => {
-    // This would load the specific chat from history
-    console.log('Loading chat:', chatId);
-    setIsSidebarOpen(false);
+  const loadChat = async (chatSession) => {
+    try {
+      // Load conversation history for the selected chat session
+      const response = await axios.get(`${API_BASE}/conversations/${chatSession.session_id}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      
+      if (response.data && Array.isArray(response.data)) {
+        const history = response.data.flatMap(conv => [
+          { type: 'user', content: conv.user_message, language: conv.language },
+          { type: 'agent', content: conv.agent_response, language: conv.language }
+        ]);
+        setMessages(history);
+        setSessionId(chatSession.session_id);
+        localStorage.setItem('currentSessionId', chatSession.session_id);
+        localStorage.setItem('currentChatMessages', JSON.stringify(history));
+      }
+      
+      setIsSidebarOpen(false);
+    } catch (error) {
+      console.error('Error loading chat:', error);
+      alert('Error loading chat history');
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -395,11 +501,14 @@ const handleAuth = async (e) => {
               chatHistory.map(chat => (
                 <div 
                   key={chat.id} 
-                  className="chat-history-item"
-                  onClick={() => loadChat(chat.id)}
+                  className={`chat-history-item ${sessionId === chat.session_id ? 'active' : ''}`}
+                  onClick={() => loadChat(chat)}
                 >
                   <div className="chat-title">{chat.title}</div>
-                  <div className="chat-date">{chat.date}</div>
+                  <div className="chat-meta">
+                    <span className="chat-date">{formatDate(chat.updated_at || chat.created_at)}</span>
+                    <span className="message-count">{chat.message_count} messages</span>
+                  </div>
                 </div>
               ))
             )}
