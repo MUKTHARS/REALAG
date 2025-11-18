@@ -22,7 +22,7 @@ function ChatApp() {
 
   const chatContent = {
     english: {
-      title: 'DubaiEstate AI',
+      title: 'Homeiq AI',
       newChat: 'New Chat',
       send: 'Send',
       sending: 'Sending...',
@@ -568,7 +568,7 @@ const handleGoogleLogin = () => {
         <div className="messages-area">
           {messages.length === 0 && (
             <div className="welcome-simple">
-              <div className="welcome-icon">🏢</div>
+              <div className="welcome-icon">🪎</div>
               <p>{content.welcome}</p>
               {/* {!user && (
                 <div className="guest-notice">

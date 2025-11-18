@@ -98,7 +98,7 @@ html {
 }
 
 .header-main h1::before {
-  content: '🏢';
+  content: '🪎';
   font-size: 2rem;
   filter: drop-shadow(0 2px 4px rgba(214, 158, 46, 0.3));
 }

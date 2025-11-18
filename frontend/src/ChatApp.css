@@ -1059,3 +1059,25 @@
     opacity: 1;
   }
 }
+
+/* Professional Minimal Header Title */
+.chat-header-simple .chat-title {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 1.375rem !important;
+  letter-spacing: -0.01em !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+/* Minimal Logo Emoji */
+.chat-header-simple .chat-title::before {
+  content: "🪎";
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}

@@ -48,7 +48,7 @@ const HomePage = () => {
         ]
       },
       about: {
-        title: 'About DubaiEstate AI',
+        title: 'About Homeiq AI',
         description: 'We revolutionize real estate interactions through advanced artificial intelligence. Our multilingual AI agent provides instant, accurate property information and market insights across Dubai\'s dynamic real estate landscape.',
         mission: 'Our mission is to make real estate intelligence accessible to everyone, breaking language barriers and providing expert insights 24/7.',
         stats: [
@@ -177,8 +177,8 @@ const HomePage = () => {
       <nav className="navbar">
         <div className="nav-container">
           <div className="nav-logo">
-            <span className="logo-icon">🏢</span>
-            <span className="logo-text">DubaiEstate AI</span>
+            <span className="logo-icon">🪎</span>
+            <span className="logo-text">Homeiq AI</span>
           </div>
           
           <div className="nav-links">
@@ -319,8 +319,8 @@ const HomePage = () => {
           <div className="footer-content">
             <div className="footer-brand">
               <div className="nav-logo">
-                <span className="logo-icon">🏢</span>
-                <span className="logo-text">DubaiEstate AI</span>
+                <span className="logo-icon">🪎</span>
+                <span className="logo-text">Homeiq AI</span>
               </div>
               <p>{currentContent.footer.description}</p>
             </div>
@@ -350,7 +350,7 @@ const HomePage = () => {
           </div>
           
           <div className="footer-bottom">
-            <p>&copy; 2024 DubaiEstate AI. {currentContent.footer.rights}</p>
+            <p>&copy; 2024 Homeiq AI. {currentContent.footer.rights}</p>
           </div>
         </div>
       </footer>
