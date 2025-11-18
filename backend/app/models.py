@@ -5,16 +5,41 @@ import datetime
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    name = Column(String)
+    hashed_password = Column(String)
+    is_oauth = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
 class Conversation(Base):
     __tablename__ = "conversations"
     
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(String, index=True)  # Removed unique constraint if it causes issues
+    session_id = Column(String, index=True)
+    user_id = Column(Integer, index=True)  # Link to user
     user_message = Column(Text)
     agent_response = Column(Text)
     language = Column(String, default="english")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     conversation_data = Column(JSON)
+
+class ChatSession(Base):
+    __tablename__ = "chat_sessions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True)
+    user_id = Column(Integer, index=True)  # Link to user
+    title = Column(String)
+    language = Column(String, default="english")
+    message_count = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    is_active = Column(Boolean, default=True)
 
 class Property(Base):
     __tablename__ = "properties"

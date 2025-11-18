@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import chat, properties
+from app.routes import chat, properties, auth
 from app.database import engine
 from app.models import Base
 import logging
@@ -37,6 +37,7 @@ app.add_middleware(
 # Include routers
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(properties.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1/auth")  # Fixed: Added /auth prefix
 
 @app.get("/")
 async def root():
